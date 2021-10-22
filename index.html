@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"
+      integrity="sha512-USKCQh+O8BX/a2K06xPNTwduhmQvN/m9FhkR7PRysCRlPoqIItl7Qz3xVTZC/oIHe6g5XvnLHDUgGpRMZZTmFQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://pagecdn.io/lib/ace/1.4.12/ace.js"
+      crossorigin="anonymous"
+      integrity="sha256-Q9hnBpgBFstzZOr+OKFOWZWfcF5nFXO8Qz48Nmndo6U="
+    ></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+      #editor {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="go" onclick="go()">Play</button>
+
+    <div id="editor">
+      if ([0,3,4,15].indexOf(i) >= 0) { kick.triggerAttackRelease("50", "8n"); }
+      if ([2,7,12].indexOf(i) >= 0) { snare.triggerAttackRelease("300", ""); }
+    </div>
+
+    <script>
+      let editor = ace.edit("editor");
+      editor.setTheme("ace/theme/monokai");
+      editor.getSession().setMode("ace/mode/javascript");
+      editor.setOptions({ fontSize: "12pt" });
+
+      const vol = new Tone.Volume(-25).toDestination();
+      const polySynth = new Tone.PolySynth(Tone.FMSynth, { maxpolyphony: 3 });
+      const kick = new Tone.MembraneSynth();
+      const kickVol = new Tone.Volume(0).connect(vol);
+      const snare = new Tone.MetalSynth();
+      const hat = new Tone.MetalSynth();
+
+      polySynth.connect(vol);
+      kick.connect(kickVol);
+      snare.connect(vol);
+      hat.connect(vol);
+
+      function go() {
+        //return the events of the array in order one at a
+        //time every 16th note
+
+        // snare.triggerAttackRelease("C4", "16n");
+
+        Tone.context.latencyHint = "fastest";
+        Tone.Transport.bpm.value = 60;
+
+        let seq = new Tone.Sequence(
+          (time, i) => {
+            eval(editor.getValue());
+          },
+          [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+          "16n"
+        );
+
+        Tone.Transport.start("0.2");
+        seq.start();
+      }
+    </script>
+  </body>
+</html>
